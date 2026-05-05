@@ -574,20 +574,20 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
     <title>晨輝小賣店 - 10以內的減法</title>
     
     <!-- Tailwind CSS -->
-    <script src="./晨輝小賣店 - 10以內的減法_files/saved_resource"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- React & ReactDOM -->
-    <script src="./晨輝小賣店 - 10以內的減法_files/react.production.min.js.下載" crossorigin="anonymous"></script>
-    <script src="./晨輝小賣店 - 10以內的減法_files/react-dom.production.min.js.下載" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Motion for Framer Motion -->
+    <script src="https://unpkg.com/framer-motion@11/umd/framer-motion.js"></script>
     
     <!-- Babel for JSX -->
-    <script src="./晨輝小賣店 - 10以內的減法_files/babel.min.js.下載" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- Framer Motion -->
-    <script src="./晨輝小賣店 - 10以內的減法_files/framer-motion.js.下載" crossorigin="anonymous"></script>
-    
-    <!-- Canvas Confetti -->
-    <script src="./晨輝小賣店 - 10以內的減法_files/confetti.browser.min.js.下載" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/canvas-confetti@1.9.3/dist/confetti.browser.min.js" crossorigin></script>
 
     <style>
         /* 全局與自訂字體設定 */
@@ -1389,28 +1389,16 @@ var App = function App() {
       numpadInput = _useState28[0],
       setNumpadInput = _useState28[1];
 
-    // Render Coins (Visual Aid)
+    // Render Coins (Visual Aid) - 用圖片顯示
     var renderCoins = function renderCoins(count, spentCount) {
       var coins = [];
+      var coinImages = {1: 'coins/1dollar.jpeg', 2: 'coins/2dolar.jpeg', 5: 'coins/5dollar.jpeg', 10: 'coins/10dollar.jpeg'};
       for (var i = 0; i < count; i++) {
         var isSpent = i < spentCount;
-        coins.push(/*#__PURE__*/React.createElement(motion.div, {
-          key: i,
-          initial: {
-            scale: 0
-          },
-          animate: {
-            scale: 1
-          },
-          transition: {
-            delay: i * 0.05
-          },
-          className: "w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center font-bold text-lg md:text-xl border-4 shadow-sm\n                                    ".concat(isSpent ? 'bg-gray-200 border-gray-300 text-gray-400 opacity-50' : 'bg-yellow-300 border-yellow-500 text-yellow-800')
-        }, "$1"));
+        coins.push(/*#__PURE__*/React.createElement(motion.div, {key: i, initial: {scale: 0}, animate: {scale: 1}, transition: {delay: i * 0.05}, className: "w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center overflow-hidden shadow-sm " + (isSpent ? 'opacity-40 grayscale' : '')},
+          /*#__PURE__*/React.createElement("img", {src: coinImages[1], alt: "$1", className: "w-full h-full object-contain"})));
       }
-      return /*#__PURE__*/React.createElement("div", {
-        className: "flex flex-wrap justify-center gap-2 mt-4"
-      }, coins);
+      return /*#__PURE__*/React.createElement("div", {className: "flex flex-wrap justify-center gap-2 mt-4"}, coins);
     };
     var Numpad = function Numpad() {
       return /*#__PURE__*/React.createElement("div", {
@@ -2414,28 +2402,16 @@ var App = function App() {
       numpadInput = _useState28[0],
       setNumpadInput = _useState28[1];
 
-    // Render Coins (Visual Aid)
+    // Render Coins (Visual Aid) - 用圖片顯示
     var renderCoins = function renderCoins(count, spentCount) {
       var coins = [];
+      var coinImages = {1: 'coins/1dollar.jpeg', 2: 'coins/2dolar.jpeg', 5: 'coins/5dollar.jpeg', 10: 'coins/10dollar.jpeg'};
       for (var i = 0; i < count; i++) {
         var isSpent = i < spentCount;
-        coins.push(/*#__PURE__*/React.createElement(motion.div, {
-          key: i,
-          initial: {
-            scale: 0
-          },
-          animate: {
-            scale: 1
-          },
-          transition: {
-            delay: i * 0.05
-          },
-          className: "w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center font-bold text-lg md:text-xl border-4 shadow-sm\n                                    ".concat(isSpent ? 'bg-gray-200 border-gray-300 text-gray-400 opacity-50' : 'bg-yellow-300 border-yellow-500 text-yellow-800')
-        }, "$1"));
+        coins.push(/*#__PURE__*/React.createElement(motion.div, {key: i, initial: {scale: 0}, animate: {scale: 1}, transition: {delay: i * 0.05}, className: "w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center overflow-hidden shadow-sm " + (isSpent ? 'opacity-40 grayscale' : '')},
+          /*#__PURE__*/React.createElement("img", {src: coinImages[1], alt: "$1", className: "w-full h-full object-contain"})));
       }
-      return /*#__PURE__*/React.createElement("div", {
-        className: "flex flex-wrap justify-center gap-2 mt-4"
-      }, coins);
+      return /*#__PURE__*/React.createElement("div", {className: "flex flex-wrap justify-center gap-2 mt-4"}, coins);
     };
     var Numpad = function Numpad() {
       return /*#__PURE__*/React.createElement("div", {
@@ -3108,19 +3084,29 @@ root.render(/*#__PURE__*/React.createElement(App, null));
                 // Numpad input for Hard mode
                 const [numpadInput, setNumpadInput] = useState('');
 
-                // Render Coins (Visual Aid)
+                // Render Coins (Visual Aid) - 用圖片顯示
                 const renderCoins = (count, spentCount) => {
                     let coins = [];
+                    // 銀幣圖片 mapping
+                    const coinImages = {
+                        1: 'coins/1dollar.jpeg',
+                        2: 'coins/2dolar.jpeg', 
+                        5: 'coins/5dollar.jpeg',
+                        10: 'coins/10dollar.jpeg'
+                    };
+                    
                     for(let i=0; i<count; i++) {
                         const isSpent = i < spentCount;
+                        // 用$1硬幣代表每個單元
+                        const coinSrc = coinImages[1];
                         coins.push(
                             <motion.div 
                                 key={i}
                                 initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: i * 0.05 }}
-                                className={`w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center font-bold text-lg md:text-xl border-4 shadow-sm
-                                    ${isSpent ? 'bg-gray-200 border-gray-300 text-gray-400 opacity-50' : 'bg-yellow-300 border-yellow-500 text-yellow-800'}`}
+                                className={`w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center overflow-hidden shadow-sm
+                                    ${isSpent ? 'opacity-40 grayscale' : ''}`}
                             >
-                                $1
+                                <img src={coinSrc} alt="$1" className="w-full h-full object-contain" />
                             </motion.div>
                         );
                     }
