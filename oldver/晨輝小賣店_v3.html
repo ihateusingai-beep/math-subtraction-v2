@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>晨輝小賣店 - 10以內減法</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Comic Sans MS', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        
+        #menu-screen, #self-setup, #game-screen, #result-screen { display: none; }
+        #menu-screen.active, #self-setup.active, #game-screen.active, #result-screen.active { display: block; }
+        
+        h1 { color: white; font-size: 2.5rem; margin-bottom: 10px; }
+        .subtitle { color: #ffd700; font-size: 1.2rem; margin-bottom: 30px; }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 15px 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+        }
+        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+        .btn-easy { background: #4CAF50; color: white; }
+        .btn-medium { background: #FF9800; color: white; }
+        .btn-hard { background: #f44336; color: white; }
+        .btn-self { background: #9C27B0; color: white; }
+        .btn-back { background: #607D8B; color: white; margin-top: 20px; }
+        
+        .vending-machine {
+            background: #4A90E2;
+            border: 12px solid #357ABD;
+            border-radius: 40px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .screen {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 4px solid #ddd;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .question {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.4;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .speaker-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #E3F2FD;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .coins-display {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .coin {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffd700, #b8860b);
+            border: 2px solid #daa520;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #8B4513;
+        }
+        
+        .coin.used { opacity: 0.4; filter: grayscale(50%); }
+        
+        .answer-area {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .answer-btn {
+            background: white;
+            border: 4px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2196F3;
+            cursor: pointer;
+        }
+        .answer-btn:active {
+            transform: scale(0.95);
+            background: #E3F2FD;
+        }
+        
+        .numpad { display: none; }
+        .numpad.active { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 300px; margin: 0 auto; }
+        
+        .num-btn {
+            background: white;
+            border: 4px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .num-btn:active { background: #E3F2FD; }
+        .num-btn.clear { background: #FFEBEE; border-color: #ffcdd2; color: #f44336; }
+        .num-btn.ok { background: #4CAF50; border-color: #4CAF50; color: white; }
+        
+        .numpad-display {
+            background: white;
+            border: 4px solid #2196F3;
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+        .numpad-display.placeholder span { color: #ccc; }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+            animation: popIn 0.3s ease;
+        }
+        .toast.success { background: #C8E6C9; border: 4px solid #4CAF50; color: #2E7D32; }
+        .toast.wrong { background: #FFCDD2; border: 4px solid #f44336; color: #C62828; }
+        .toast.show { display: block; }
+        
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .self-input {
+            background: white;
+            border: 4px solid #ddd;
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 1.5rem;
+            width: 100%;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .score { font-size: 4rem; font-weight: bold; color: #4A90E2; }
+        .rank { font-size: 2rem; margin: 20px 0; }
+        
+        .self-setup-title { color: white; font-size: 1.8rem; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 選單畫面 -->
+        <div id="menu-screen" class="active">
+            <h1>🏪 晨輝小賣店</h1>
+            <p class="subtitle">10以內減法</p>
+            <button class="btn btn-easy" data-mode="easy">🔢 初階 - 圖形幫幫手</button>
+            <button class="btn btn-medium" data-mode="medium">✅ 中階 - 選擇答案</button>
+            <button class="btn btn-hard" data-mode="hard">⌨️ 高階 - 自己輸入</button>
+            <button class="btn btn-self" data-mode="self">🧠 自學模式</button>
+        </div>
+        
+        <!-- 自學模式設定 -->
+        <div id="self-setup">
+            <div class="vending-machine">
+                <h2 class="self-setup-title">自學模式設定</h2>
+                <div class="screen">
+                    <label style="display:block;font-size:1.2rem;margin:10px 0;">原來有幾多蚊？</label>
+                    <input type="number" id="self-total" class="self-input" placeholder="例如：10">
+                    
+                    <label style="display:block;font-size:1.2rem;margin:10px 0;">買嘢用咗幾多蚊？</label>
+                    <input type="number" id="self-spent" class="self-input" placeholder="例如：4">
+                    
+                    <button class="btn btn-self" id="start-self-btn">✅ 開始答題</button>
+                </div>
+                <button class="btn btn-back" data-action="menu">返回</button>
+            </div>
+        </div>
+        
+        <!-- 遊戲畫面 -->
+        <div id="game-screen">
+            <div class="vending-machine">
+                <div class="screen">
+                    <button class="speaker-btn" id="speaker-btn">🔊</button>
+                    <div class="question" id="question-text"></div>
+                </div>
+                <div class="screen">
+                    <div class="coins-display" id="coins-display"></div>
+                    <div class="answer-area" id="answer-area"></div>
+                    <div class="numpad" id="numpad">
+                        <div class="numpad-display" id="numpad-display"><span>請輸入答案</span></div>
+                        <button class="num-btn" data-num="1">1</button>
+                        <button class="num-btn" data-num="2">2</button>
+                        <button class="num-btn" data-num="3">3</button>
+                        <button class="num-btn" data-num="4">4</button>
+                        <button class="num-btn" data-num="5">5</button>
+                        <button class="num-btn" data-num="6">6</button>
+                        <button class="num-btn" data-num="7">7</button>
+                        <button class="num-btn" data-num="8">8</button>
+                        <button class="num-btn" data-num="9">9</button>
+                        <button class="num-btn clear" id="num-clear">✕</button>
+                        <button class="num-btn" data-num="0">0</button>
+                        <button class="num-btn ok" id="num-ok">✓</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-back" data-action="menu">返回選單</button>
+        </div>
+        
+        <!-- 成績畫面 -->
+        <div id="result-screen">
+            <div class="result-card">
+                <h2 style="font-size:2rem;margin-bottom:20px;">🎉 完成晒喇！</h2>
+                <div class="score" id="score-display">0/0</div>
+                <div class="rank" id="rank-display"></div>
+                <button class="btn btn-easy" data-action="menu">再玩多次</button>
+            </div>
+        </div>
+        
+        <!-- Feedback -->
+        <div class="toast" id="toast"></div>
+    </div>
+    
+    <script>
+    (function() {
+        'use strict';
+        
+        // ===== 遊戲狀態 =====
+        let currentMode = 'medium';
+        let questions = [];
+        let currentIndex = 0;
+        let correctCount = 0;
+        let currentAnswer = '';
+        
+        // ===== DOM 元素 =====
+        const screens = {
+            menu: document.getElementById('menu-screen'),
+            self: document.getElementById('self-setup'),
+            game: document.getElementById('game-screen'),
+            result: document.getElementById('result-screen')
+        };
+        
+        // ===== 畫面切換 =====
+        function showScreen(name) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            screens[name].classList.add('active');
+        }
+        
+        // ===== 題目生成 =====
+        function generateQuestions(count, mode) {
+            const qs = [];
+            for (let i = 0; i < count; i++) {
+                const total = Math.floor(Math.random() * 9) + 2;
+                const spent = Math.floor(Math.random() * (total - 1)) + 1;
+                const answer = total - spent;
+                
+                let options = [answer];
+                while (options.length < 4) {
+                    const opt = Math.floor(Math.random() * (total));
+                    if (!options.includes(opt) && opt >= 0) {
+                        options.push(opt);
+                    }
+                }
+                options = options.sort(() => Math.random() - 0.5);
+                
+                qs.push({
+                    total,
+                    spent,
+                    answer,
+                    options,
+                    text: `你有 ${total} 元，用了 ${spent} 元，仲剩幾多元？`
+                });
+            }
+            return qs;
+        }
+        
+        // ===== 遊戲控制 =====
+        function startGame(mode) {
+            currentMode = mode;
+            
+            if (mode === 'self') {
+                showScreen('self');
+                return;
+            }
+            
+            questions = generateQuestions(10, mode);
+            currentIndex = 0;
+            correctCount = 0;
+            
+            showScreen('game');
+            showQuestion();
+        }
+        
+        function startSelfGame() {
+            const totalInput = document.getElementById('self-total');
+            const spentInput = document.getElementById('self-spent');
+            const total = parseInt(totalInput.value);
+            const spent = parseInt(spentInput.value);
+            
+            if (isNaN(total) || isNaN(spent) || total < spent || total > 10) {
+                alert('輸入錯誤！總額要在1-10之間，而且要比用咗既多');
+                return;
+            }
+            
+            questions = [{
+                total,
+                spent,
+                answer: total - spent,
+                options: [],
+                text: `你有 ${total} 元，用了 ${spent} 元，仲剩幾多元？`
+            }];
+            currentMode = 'hard';
+            currentIndex = 0;
+            correctCount = 0;
+            
+            showScreen('game');
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            const q = questions[currentIndex];
+            
+            document.getElementById('question-text').textContent = q.text;
+            
+            // 顯示硬幣
+            const coinsDiv = document.getElementById('coins-display');
+            coinsDiv.innerHTML = '';
+            if (currentMode === 'easy' || currentMode === 'self') {
+                for (let i = 0; i < q.total; i++) {
+                    const coin = document.createElement('div');
+                    coin.className = 'coin' + (i < q.spent ? ' used' : '');
+                    coin.textContent = '$1';
+                    coinsDiv.appendChild(coin);
+                }
+                coinsDiv.style.display = 'flex';
+            } else {
+                coinsDiv.style.display = 'none';
+            }
+            
+            // 顯示答案區
+            const answerArea = document.getElementById('answer-area');
+            const numpad = document.getElementById('numpad');
+            
+            if (currentMode === 'medium') {
+                answerArea.style.display = 'grid';
+                numpad.classList.remove('active');
+                answerArea.innerHTML = '';
+                q.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-btn';
+                    btn.textContent = opt + ' 元';
+                    btn.onclick = function() { checkAnswer(opt); };
+                    answerArea.appendChild(btn);
+                });
+            } else {
+                answerArea.style.display = 'none';
+                numpad.classList.add('active');
+                currentAnswer = '';
+                numUpdateDisplay();
+            }
+            
+            // 朗讀問題
+            speakCurrent();
+        }
+        
+        // ===== Numpad =====
+        function numInput(n) {
+            currentAnswer += n;
+            if (currentAnswer.length > 2) currentAnswer = currentAnswer.slice(0, 2);
+            numUpdateDisplay();
+        }
+        
+        function numClear() {
+            currentAnswer = '';
+            numUpdateDisplay();
+        }
+        
+        function numUpdateDisplay() {
+            const display = document.getElementById('numpad-display');
+            const span = display.querySelector('span');
+            if (currentAnswer) {
+                span.textContent = currentAnswer;
+                display.classList.remove('placeholder');
+            } else {
+                span.textContent = '請輸入答案';
+                display.classList.add('placeholder');
+            }
+        }
+        
+        function numSubmit() {
+            if (!currentAnswer) return;
+            checkAnswer(parseInt(currentAnswer));
+        }
+        
+        // ===== 答案檢查 =====
+        function checkAnswer(userAns) {
+            const q = questions[currentIndex];
+            const correct = userAns === q.answer;
+            
+            if (correct) {
+                correctCount++;
+                showToast('✅ 正確！', 'success');
+            } else {
+                showToast('❌ 錯喇，正確答案係 ' + q.answer + ' 元', 'wrong');
+            }
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(correct ? 100 : 200);
+            }
+            
+            setTimeout(function() {
+                currentIndex++;
+                if (currentIndex < questions.length) {
+                    currentAnswer = '';
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1200);
+        }
+        
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 1000);
+        }
+        
+        // ===== 成績 =====
+        function showResult() {
+            showScreen('result');
+            
+            document.getElementById('score-display').textContent = correctCount + '/' + questions.length;
+            
+            let rank = '';
+            if (questions.length === 1) {
+                rank = correctCount === 1 ? '⭐ 超棒！' : '再試過！';
+            } else {
+                var rate = correctCount / questions.length;
+                if (rate >= 0.9) rank = '🌟 表現优异！';
+                else if (rate >= 0.7) rank = '👍 做得好！';
+                else if (rate >= 0.5) rank = '💪 有進步！';
+                else rank = '📚 再努力！';
+            }
+            document.getElementById('rank-display').textContent = rank;
+        }
+        
+        function showMenu() {
+            showScreen('menu');
+            document.getElementById('self-total').value = '';
+            document.getElementById('self-spent').value = '';
+        }
+        
+        // ===== 語音 =====
+        function speakCurrent() {
+            var q = questions[currentIndex];
+            if (q) {
+                speak(q.text);
+            }
+        }
+        
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                var utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-HK';
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            }
+        }
+        
+        // ===== Event Listeners =====
+        document.querySelectorAll('[data-mode]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                startGame(this.getAttribute('data-mode'));
+            });
+        });
+        
+        document.querySelectorAll('[data-action="menu"]').forEach(function(btn) {
+            btn.addEventListener('click', showMenu);
+        });
+        
+        document.getElementById('start-self-btn').addEventListener('click', startSelfGame);
+        
+        document.getElementById('speaker-btn').addEventListener('click', speakCurrent);
+        
+        document.querySelectorAll('[data-num]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                numInput(this.getAttribute('data-num'));
+            });
+        });
+        
+        document.getElementById('num-clear').addEventListener('click', numClear);
+        document.getElementById('num-ok').addEventListener('click', numSubmit);
+        
+    })();
+    </script>
+</body>
+</html>
